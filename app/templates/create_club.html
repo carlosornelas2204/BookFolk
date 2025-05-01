@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Criar Novo Clube</h2>
+    
+    <form method="POST" action="{{ url_for('main.create_club') }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome do Clube</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="max_members" class="form-label">Número de Membros (incluindo você)</label>
+            <input type="number" class="form-control" id="max_members" 
+                   name="max_members" min="2" max="20" value="4" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Criar Clube</button>
+    </form>
+</div>
+{% endblock %}

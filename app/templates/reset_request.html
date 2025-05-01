@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Recuperar senha</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.email.label(class="form-label") }}  <!-- label -->
+        {{ form.email(class="form-control") }}    <!-- campo de email -->
+    </div>
+    <div class="d-grid gap-2">
+        {{ form.submit(class="btn btn-success") }}  <!-- botão de submit -->
+    </div>
+</form>
+<p><a href="{{ url_for('auth.login') }}">Voltar ao login</a></p>
+{% endblock %}

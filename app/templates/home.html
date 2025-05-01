@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Minhas Estatísticas</h4>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('main.recommend') }}" class="btn btn-success mb-4">
+                        <i class="bi bi-lightbulb"></i> Me recomende um livro
+                    </a>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Livros esta semana</h5>
+                                    <p class="display-4">{{ weekly_books }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Gênero favorito</h5>
+                                    <p class="display-6">{{ most_read_genre[0] if most_read_genre else 'N/A' }}</p>
+                                    <small>{{ most_read_genre[1] if most_read_genre else 0 }} lidos</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Autor favorito</h5>
+                                    <p class="display-6">{{ most_read_author[0] if most_read_author else 'N/A' }}</p>
+                                    <small>{{ most_read_author[1] if most_read_author else 0 }} lidos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráficos (opcional) -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Meu Progresso Mensal</h5>
+                </div>
+                <div class="card-body">
+                    {% if weekly_books > 0 %}
+                    <canvas id="readingChart" height="200"></canvas>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Nenhum livro lido este mês. Comece sua jornada de leitura!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Atividades Recentes</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for review, book in recent_reviews %}
+                        <li class="list-group-item">
+                            <strong>{{ book.title }}</strong><br>
+                            {{ review.rating }} estrelas - {{ review.date_rated.strftime('%d/%m') }}
+                        </li>
+                        {% else %}
+                        <li class="list-group-item">Nenhuma atividade recente</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('readingChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ month_labels|tojson }},
+            datasets: [{
+                label: 'Livros lidos',
+                data: {{ month_data|tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' livro(s)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

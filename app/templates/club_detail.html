@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ club.name }} <span class="badge bg-secondary">Ciclo {{ club.current_cycle }}</span></h2>
+        <span class="badge bg-secondary">
+            {{ 'Formação' if club.current_phase == 'forming'
+              else 'Escolha de livros' if club.current_phase == 'choosing'
+              else 'Leitura em andamento' if club.current_phase == 'reading'
+              else 'Concluído' }}
+        </span>
+    </div>
+
+    {% if is_member and user_has_chosen %}
+    <div class="alert alert-success mt-3">
+        Você já escolheu seu livro para este clube.
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-8">
+            {% if club.current_phase == 'forming' %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Convite de Membros</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if is_owner %}
+                            <form method="POST" action="{{ url_for('main.invite_to_club', club_id=club.id) }}"
+                                  class="input-group mb-3">
+                                <input type="text" class="form-control" name="username"
+                                       placeholder="Nome de usuário" required>
+                                <button class="btn btn-primary" type="submit">Convidar</button>
+                            </form>
+                        {% endif %}
+
+                        <h6>Membros ({{ club.members|length }}/{{ club.max_members }})</h6>
+                        <ul class="list-group">
+                            {% for member in members %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ member.user.username }}
+                                {% if member.book_id %}
+                                    <span class="badge bg-success">Livro escolhido</span>
+                                {% endif %}
+                                {% if member.user_id == club.owner_id %}
+                                    <span class="badge bg-primary">Criador</span>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                {% if is_owner and club.current_phase == 'forming' %}
+                <div class="mt-3">
+                    <form method="POST" action="{{ url_for('main.start_reading', club_id=club.id) }}">
+                        <button type="submit" class="btn btn-primary"
+                                {% if not all_members_have_chosen %}disabled title="Todos os membros devem escolher um livro primeiro"{% endif %}>
+                            Iniciar Leitura
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+
+            {% else %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Livros Atuais</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for topic in topics if not topic.end_date %}
+                            <a href="{{ url_for('main.club_topic', club_id=club.id, topic_id=topic.id) }}"
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">#{{ topic.order }} - {{ topic.book.title }}</h5>
+                                    <small>{{ topic.start_date.strftime('%d/%m/%Y') if topic.start_date else 'Aguardando' }}</small>
+                                </div>
+                                <p class="mb-1">{{ topic.book.author }}</p>
+                                <small>{{ 'Concluído' if topic.end_date else 'Em andamento' }}</small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- SEÇÃO DE HISTÓRICO ADICIONADA AQUI -->
+            {% set completed_topics = topics|selectattr('end_date')|list %}
+            {% if completed_topics %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Histórico de Leituras</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for topic in completed_topics|sort(attribute='end_date', reverse=True) %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ topic.book.title }}</h5>
+                                <small>Concluído em {{ topic.end_date.strftime('%d/%m/%Y') }}</small>
+                            </div>
+                            <p class="mb-1">{{ topic.book.author }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary">Ciclo {{ topic.club.current_cycle }}</span>
+                                <div>
+                                    <a href="{{ url_for('main.club_topic', club_id=club.id, topic_id=topic.id) }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Ver Discussão
+                                    </a>
+                                    <a href="{{ url_for('main.rate_club_book', club_id=club.id, book_id=topic.book.id) }}"
+                                       class="btn btn-sm btn-outline-success ms-2">
+                                        Avaliar Livro
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Ações</h5>
+                </div>
+                <div class="card-body">
+                    {% if is_member and club.current_phase == 'forming' and not user_has_chosen %}
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5>Escolha seu Livro</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="{{ url_for('main.choose_book', club_id=club.id) }}">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" name="book_query" placeholder="Pesquisar livro..." required>
+                                        <button class="btn btn-primary" type="submit">Buscar</button>
+                                    </div>
+                                </form>
+
+                                {% if search_results %}
+                                <div class="mt-3">
+                                    <h6>Resultados da Busca:</h6>
+                                    <div class="list-group">
+                                        {% for book in search_results %}
+                                        <form method="POST" action="{{ url_for('main.choose_book', club_id=club.id) }}" class="list-group-item list-group-item-action">
+                                            <input type="hidden" name="book_id" value="{{ book.id }}">
+                                            <div class="d-flex">
+                                                {% if book.cover_i %}
+                                                <img src="https://covers.openlibrary.org/b/id/{{ book.cover_i }}-S.jpg" class="me-3" style="height: 50px;">
+                                                {% endif %}
+                                                <div>
+                                                    <h6>{{ book.title }}</h6>
+                                                    <small class="text-muted">{{ book.author }}</small>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-sm btn-success mt-2">Escolher este livro</button>
+                                        </form>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if is_owner and club.current_phase == 'reading' %}
+                        <h6>Gerenciar Clube:</h6>
+                        {% for topic in topics if not topic.end_date %}
+                        <a href="{{ url_for('main.complete_topic', club_id=club.id, topic_id=topic.id) }}"
+                           class="btn btn-sm btn-success w-100 mb-2">
+                            Concluir "{{ topic.book.title }}"
+                        </a>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if is_owner and club.current_phase == 'completed' %}
+                        <form method="POST" action="{{ url_for('main.restart_club', club_id=club.id) }}">
+                            <button type="submit" class="btn btn-primary w-100">
+                                Reiniciar Clube (Ciclo {{ club.current_cycle + 1 }})
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

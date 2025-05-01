@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Buscar Livros</h2>
+
+    <form method="GET" action="{{ url_for('main.books') }}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="query" class="form-control"
+                   value="{{ query }}" placeholder="Busque por título ou autor" required>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+    </form>
+
+    {% if query %}
+        <div class="mb-3">
+            <small class="text-muted">
+                {{ total_results }} resultados encontrados
+            </small>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for book in books %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if book.cover_i %}
+                    <img src="https://covers.openlibrary.org/b/id/{{ book.cover_i }}-M.jpg"
+                         class="card-img-top" loading="lazy" alt="Capa do livro">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                         style="height: 200px;">
+                        <i class="fas fa-book-open fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text">{{ book.author }}</p>
+                    </div>
+
+                    <div class="card-footer bg-white">
+                        <form method="POST" action="{{ url_for('main.mark_read') }}">
+                            <input type="hidden" name="book_id" value="{{ book.key }}">
+                            <input type="hidden" name="title" value="{{ book.title }}">
+                            <input type="hidden" name="author" value="{{ book.author }}">
+                            <input type="hidden" name="cover_i" value="{{ book.cover_i if book.cover_i else '' }}">
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fas fa-check"></i> Marcar como Lido
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Paginação -->
+        {% if total_results > per_page %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{{ url_for('main.books', query=query, page=page-1) }}">
+                        Anterior
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for p in range(1, (total_results//per_page)+2) %}
+                    {% if p >= page-2 and p <= page+2 %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link"
+                           href="{{ url_for('main.books', query=query, page=p) }}">
+                            {{ p }}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page*per_page < total_results %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{{ url_for('main.books', query=query, page=page+1) }}">
+                        Próxima
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">
+            Digite um termo para buscar livros
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

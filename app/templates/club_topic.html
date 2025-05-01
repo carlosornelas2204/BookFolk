@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ club.name }} - {{ topic.book.title }}</h2>
+        <a href="{{ url_for('main.club_detail', club_id=club.id) }}" class="btn btn-outline-secondary">
+            Voltar para o clube
+        </a>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Discussão</h5>
+        </div>
+        <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+            {% for message in messages %}
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ message.user.username }}</strong>
+                    <small class="text-muted">{{ message.sent_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                </div>
+                <p class="mb-0">{{ message.content }}</p>
+            </div>
+            {% if not loop.last %}<hr>{% endif %}
+            {% else %}
+            <div class="text-center text-muted">
+                Nenhuma mensagem ainda. Seja o primeiro a comentar!
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <form method="POST" action="{{ url_for('main.send_message', club_id=club.id, topic_id=topic.id) }}">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" name="content" placeholder="Digite sua mensagem..." required>
+            <button class="btn btn-primary" type="submit">Enviar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Nova senha</h2>
+<form method="POST">
+    <label for="password">Nova senha:</label>
+    <input type="password" id="password" name="password" required>
+    <button type="submit">Redefinir senha</button>
+</form>
+<p><a href="{{ url_for('auth.login') }}">Voltar ao login</a></p>
+{% endblock %}

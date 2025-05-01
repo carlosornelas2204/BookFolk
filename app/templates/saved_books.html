@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Meus Livros Salvos</h2>
+    
+    {% if not user_books %}
+    <div class="alert alert-info">Você ainda não salvou nenhum livro.</div>
+    {% else %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for user_book in user_books %}
+        <div class="col">
+            <div class="card h-100">
+                {% if user_book.book.cover_i %}
+                <img src="https://covers.openlibrary.org/b/id/{{ user_book.book.cover_i }}-M.jpg" class="card-img-top">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ user_book.book.title }}</h5>
+                    <p class="card-text">{{ user_book.book.author }}</p>
+                </div>
+                <div class="card-footer">
+                    {% if user_book.read %}
+                    <small class="text-success">Lido em {{ user_book.date_read.strftime('%d/%m/%Y') }}</small>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('main.mark_read', book_id=user_book.book.id) }}">
+                        <button type="submit" class="btn btn-sm btn-success">Marcar como Lido</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

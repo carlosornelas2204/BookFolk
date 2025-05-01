@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Avaliar Livro do Clube: {{ book.title }}</h2>
+    <p class="lead">Você está concluindo a discussão deste livro no clube <strong>{{ club.name }}</strong>.</p>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Sua Avaliação</label>
+            <div class="rating">
+                {% for i in range(5, 0, -1) %}
+                <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}"
+                       {% if review and review.rating == i %}checked{% else %}{% if i == 5 %}checked{% endif %}{% endif %} required>
+                <label for="star{{ i }}">★</label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="comment" class="form-label">Comentário sobre o livro</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3">{% if review %}{{ review.comment }}{% else %}Lido no clube "{{ club.name }}"{% endif %}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Concluir Discussão e Avaliar
+        </button>
+        <a href="{{ url_for('main.club_detail', club_id=club_id) }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+<style>
+    .rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+    }
+    .rating input {
+        display: none;
+    }
+    .rating label {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .rating input:checked ~ label,
+    .rating label:hover,
+    .rating label:hover ~ label {
+        color: #ffc107;
+    }
+    .rating input:checked + label {
+        color: #ffc107;
+    }
+</style>
+{% endblock %}

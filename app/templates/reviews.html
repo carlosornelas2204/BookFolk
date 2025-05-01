@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Livros Mais Bem Avaliados</h2>
+
+    <form method="GET" action="{{ url_for('main.home') }}" class="mb-4">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <input type="text" name="query" class="form-control" placeholder="Filtrar por título ou autor">
+            </div>
+            <div class="col-md-3">
+                <select name="min_rating" class="form-select">
+                    <option value="0">Todas as avaliações</option>
+                    <option value="4">4+ estrelas</option>
+                    <option value="3">3+ estrelas</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for book_data in books_data %}
+        {% set book = book_data[0] %}
+        {% set avg_rating = book_data[1] %}
+        {% set review_count = book_data[2] %}
+
+        <div class="col">
+            <div class="card h-100">
+                {% if book.cover_i %}
+                <img src="https://covers.openlibrary.org/b/id/{{ book.cover_i }}-M.jpg" class="card-img-top">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">{{ book.author }}</p>
+
+                    <div class="mb-2">
+                        <span class="text-warning">
+                            {% if avg_rating %}
+                                {% for i in range(1, 6) %}
+                                    {% if i <= avg_rating|round %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="text-muted">({{ "%.1f"|format(avg_rating) }})</span>
+                            {% else %}
+                                <span class="text-muted">Não avaliado</span>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <small class="text-muted">{{ review_count }} avaliação{{ 's' if review_count != 1 }}</small>
+                </div>
+                <div class="card-footer bg-white">
+                    <a href="{{ url_for('main.book_detail', book_id=book.id) }}" class="btn btn-sm btn-outline-primary">Ver detalhes</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,135 @@
+/* Centralizando os menus e garantindo um layout mais bonito */
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-item {
+    font-size: 1.2rem;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.card-body {
+    padding: 1.2rem;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.btn-primary, .btn-success {
+    background-color: #007bff;
+    border-radius: 8px;
+    padding: 10px 20px;
+}
+
+.btn-success {
+    background-color: #28a745;
+}
+
+/* Estilo para os botões de convite */
+.btn-invite-action {
+    margin: 0 5px;
+    min-width: 80px;
+}
+
+.invite-item {
+    transition: all 0.3s ease;
+}
+
+.invite-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estilo para os itens de livro */
+.book-choice-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.book-choice-item:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+.book-cover-small {
+    height: 50px;
+    object-fit: contain;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Adicione ao seu arquivo CSS principal */
+.dropdown-menu {
+    min-width: 250px;
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.profile-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+
+/* Estilo para o dropdown de usuário */
+#userDropdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Espaçamento na navbar */
+.navbar-nav {
+    gap: 0.5rem;
+}
+
+/* Dropdown mais largo */
+.dropdown-menu {
+    min-width: 280px;
+}
+
+.logo-img {
+        height: 50px;             /* altura fixa */
+        width: 160px;             /* mais larga */
+        object-fit: contain;      /* evita distorções */
+        transition: transform 0.3s ease;
+    }
+
+    .logo-img:hover {
+        transform: scale(1.05);
+    }

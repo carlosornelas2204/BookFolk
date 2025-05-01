@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Meus Livros Lidos e Avaliados</h2>
+
+    {% if not reviews %}
+    <div class="alert alert-info">Você ainda não avaliou nenhum livro.</div>
+    {% else %}
+    <div class="row row-cols-1 g-4">
+        {% for review in reviews %}
+        <div class="col">
+            <div class="card">
+                <div class="row g-0">
+                    {% if review.book.cover_i %}
+                    <div class="col-md-2">
+                        <img src="https://covers.openlibrary.org/b/id/{{ review.book.cover_i }}-M.jpg"
+                             class="img-fluid rounded-start" loading="lazy">
+                    </div>
+                    {% endif %}
+                    <div class="col-md-10">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title">{{ review.book.title }}</h5>
+                                    <p class="card-text">{{ review.book.author }}</p>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('main.rate_book', book_id=review.book.id) }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <span class="text-warning">
+                                    {% for i in range(1, 6) %}
+                                        {% if i <= review.rating %}
+                                            ★
+                                        {% else %}
+                                            ☆
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                                <small class="text-muted ms-2">
+                                    Avaliado em {{ review.date_rated.strftime('%d/%m/%Y') }}
+                                </small>
+                            </div>
+
+                            {% if review.comment %}
+                            <div class="card-text bg-light p-3 rounded">
+                                {{ review.comment }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

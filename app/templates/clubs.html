@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Meus Clubes de Leitura</h2>
+        <a href="{{ url_for('main.create_club') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Criar Novo Clube
+        </a>
+    </div>
+    
+    {% if not clubs %}
+    <div class="alert alert-info">Você não participa de nenhum clube ainda.</div>
+    {% else %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for club in clubs %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ club.name }}</h5>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Criado por: {{ club.owner.username }}
+                        </small>
+                    </p>
+                    <p class="card-text">
+                        Membros: {{ club.members|length }}/{{ club.max_members }}
+                    </p>
+                    <p class="card-text">
+                        Fase: {{ 'Formação' if club.current_phase == 'forming' 
+                                  else 'Escolha de livros' if club.current_phase == 'choosing'
+                                  else 'Leitura em andamento' if club.current_phase == 'reading'
+                                  else 'Concluído' }}
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('main.club_detail', club_id=club.id) }}" 
+                       class="btn btn-sm btn-outline-primary">
+                        Ver Detalhes
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
